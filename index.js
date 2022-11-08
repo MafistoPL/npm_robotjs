@@ -1,5 +1,7 @@
 var robotjs = require('./build/Release/robotjs.node');
 
+console.log("my version of robot js!");
+
 module.exports = robotjs;
 
 module.exports.screen = {};
