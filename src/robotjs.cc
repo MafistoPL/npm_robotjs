@@ -95,24 +95,6 @@ NAN_METHOD(updateScreenMetrics)
 	info.GetReturnValue().Set(Nan::New(1));
 }
 
-NAN_METHOD(moveMouse)
-{
-	if (info.Length() != 2)
-	{
-		return Nan::ThrowError("Invalid number of arguments.");
-	}
-
-	int32_t x = Nan::To<int32_t>(info[0]).FromJust();
-	int32_t y = Nan::To<int32_t>(info[1]).FromJust();
-
-	MMSignedPoint point;
-	point = MMSignedPointMake(x, y);
-	moveMouse(point);
-	microsleep(mouseDelay);
-
-	info.GetReturnValue().Set(Nan::New(1));
-}
-
 NAN_METHOD(moveMouseSmooth)
 {
 	if (info.Length() > 3 || info.Length() < 2 )
@@ -849,8 +831,8 @@ NAN_MODULE_INIT(InitAll)
 	Nan::Set(target, Nan::New("updateScreenMetrics").ToLocalChecked(),
 		Nan::GetFunction(Nan::New<FunctionTemplate>(updateScreenMetrics)).ToLocalChecked());
 
-	Nan::Set(target, Nan::New("moveMouse").ToLocalChecked(),
-		Nan::GetFunction(Nan::New<FunctionTemplate>(moveMouse)).ToLocalChecked());
+	// Nan::Set(target, Nan::New("moveMouse").ToLocalChecked(),
+	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(moveMouse)).ToLocalChecked());
 
 	Nan::Set(target, Nan::New("moveMouseSmooth").ToLocalChecked(),
 		Nan::GetFunction(Nan::New<FunctionTemplate>(moveMouseSmooth)).ToLocalChecked());
@@ -945,8 +927,27 @@ static void getScreenSize(const v8::FunctionCallbackInfo<v8::Value>& info)
   //       isolate, "Hello from cpp code! Hello there! Native context-aware module.").ToLocalChecked());
 }
 
+static void moveMouse(const v8::FunctionCallbackInfo<v8::Value>& info) 
+{
+	if (info.Length() != 2)
+	{
+		return Nan::ThrowError("Invalid number of arguments.");
+	}
+
+	int32_t x = Nan::To<int32_t>(info[0]).FromJust();
+	int32_t y = Nan::To<int32_t>(info[1]).FromJust();
+
+	MMSignedPoint point;
+	point = MMSignedPointMake(x, y);
+	moveMouse(point);
+	microsleep(mouseDelay);
+
+	info.GetReturnValue().Set(Nan::New(1));
+}
+
 // Initialize this addon to be context-aware.
-NODE_MODULE_INIT(/* exports, module, context */) {
+NODE_MODULE_INIT(/* exports, module, context */) 
+{
   Isolate* isolate = context->GetIsolate();
 
   AddonData* data = new AddonData(isolate);
@@ -957,4 +958,9 @@ NODE_MODULE_INIT(/* exports, module, context */) {
                String::NewFromUtf8(isolate, "getScreenSize").ToLocalChecked(),
                FunctionTemplate::New(isolate, getScreenSize, external)
                   ->GetFunction(context).ToLocalChecked()).FromJust();
+
+	exports->Set(context,
+               String::NewFromUtf8(isolate, "moveMouse").ToLocalChecked(),
+               FunctionTemplate::New(isolate, moveMouse, external)
+                  ->GetFunction(context).ToLocalChecked()).FromJust();			
 }
