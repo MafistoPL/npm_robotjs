@@ -120,7 +120,7 @@ NAN_METHOD(moveMouseSmooth)
 	info.GetReturnValue().Set(Nan::New(1));
 }
 
-NAN_METHOD(getMousePos)
+static void getMousePos(const v8::FunctionCallbackInfo<v8::Value>& info) 
 {
 	MMPoint pos = getMousePos();
 
@@ -837,8 +837,8 @@ NAN_MODULE_INIT(InitAll)
 	Nan::Set(target, Nan::New("moveMouseSmooth").ToLocalChecked(),
 		Nan::GetFunction(Nan::New<FunctionTemplate>(moveMouseSmooth)).ToLocalChecked());
 
-	Nan::Set(target, Nan::New("getMousePos").ToLocalChecked(),
-		Nan::GetFunction(Nan::New<FunctionTemplate>(getMousePos)).ToLocalChecked());
+	// Nan::Set(target, Nan::New("getMousePos").ToLocalChecked(),
+	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(getMousePos)).ToLocalChecked());
 
 	Nan::Set(target, Nan::New("mouseClick").ToLocalChecked(),
 		Nan::GetFunction(Nan::New<FunctionTemplate>(mouseClick)).ToLocalChecked());
@@ -962,5 +962,10 @@ NODE_MODULE_INIT(/* exports, module, context */)
 	exports->Set(context,
                String::NewFromUtf8(isolate, "moveMouse").ToLocalChecked(),
                FunctionTemplate::New(isolate, moveMouse, external)
-                  ->GetFunction(context).ToLocalChecked()).FromJust();			
+                  ->GetFunction(context).ToLocalChecked()).FromJust();
+
+	exports->Set(context,
+               String::NewFromUtf8(isolate, "getMousePos").ToLocalChecked(),
+               FunctionTemplate::New(isolate, getMousePos, external)
+                  ->GetFunction(context).ToLocalChecked()).FromJust();	
 }
