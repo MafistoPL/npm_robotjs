@@ -42,6 +42,7 @@
   "dependencies": {
     "nan": "^2.14.0",
     "node-abi": "^2.13.0",
+    "node-gyp": "^v9.3.0",
     "prebuild-install": "^5.3.3"
   },
   "devDependencies": {
