@@ -686,19 +686,19 @@ NAN_METHOD(getPixelColor)
 	info.GetReturnValue().Set(Nan::New(hex).ToLocalChecked());
 }
 
-NAN_METHOD(getScreenSize)
-{
-	//Get display size.
-	MMSize displaySize = getMainDisplaySize();
+// NAN_METHOD(getScreenSize)
+// {
+// 	//Get display size.
+// 	MMSize displaySize = getMainDisplaySize();
 
-	//Create our return object.
-	Local<Object> obj = Nan::New<Object>();
-	Nan::Set(obj, Nan::New("width").ToLocalChecked(), Nan::New<Number>(displaySize.width));
-	Nan::Set(obj, Nan::New("height").ToLocalChecked(), Nan::New<Number>(displaySize.height));
+// 	//Create our return object.
+// 	Local<Object> obj = Nan::New<Object>();
+// 	Nan::Set(obj, Nan::New("width").ToLocalChecked(), Nan::New<Number>(displaySize.width));
+// 	Nan::Set(obj, Nan::New("height").ToLocalChecked(), Nan::New<Number>(displaySize.height));
 
-	//Return our object with .width and .height.
-	info.GetReturnValue().Set(obj);
-}
+// 	//Return our object with .width and .height.
+// 	info.GetReturnValue().Set(obj);
+// }
 
 NAN_METHOD(getXDisplayName)
 {
@@ -888,8 +888,8 @@ NAN_MODULE_INIT(InitAll)
 	Nan::Set(target, Nan::New("getPixelColor").ToLocalChecked(),
 		Nan::GetFunction(Nan::New<FunctionTemplate>(getPixelColor)).ToLocalChecked());
 
-	Nan::Set(target, Nan::New("getScreenSize").ToLocalChecked(),
-		Nan::GetFunction(Nan::New<FunctionTemplate>(getScreenSize)).ToLocalChecked());
+	// Nan::Set(target, Nan::New("getScreenSize").ToLocalChecked(),
+	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(getScreenSize)).ToLocalChecked());
 
 	Nan::Set(target, Nan::New("captureScreen").ToLocalChecked(),
 		Nan::GetFunction(Nan::New<FunctionTemplate>(captureScreen)).ToLocalChecked());
@@ -904,4 +904,57 @@ NAN_MODULE_INIT(InitAll)
 		Nan::GetFunction(Nan::New<FunctionTemplate>(setXDisplayName)).ToLocalChecked());
 }
 
-NODE_MODULE(robotjs, InitAll)
+// NODE_MODULE(robotjs, InitAll)
+
+using namespace v8;
+
+class AddonData {
+ public:
+  explicit AddonData(Isolate* isolate)
+		: call_count(0) 
+	{
+    // Ensure this per-addon-instance data is deleted at environment cleanup.
+    node::AddEnvironmentCleanupHook(isolate, DeleteInstance, this);
+  }
+
+  // Per-addon data.
+  int call_count;
+
+  static void DeleteInstance(void* data) 
+	{
+    delete static_cast<AddonData*>(data);
+  }
+};
+
+static void getScreenSize(const v8::FunctionCallbackInfo<v8::Value>& info) 
+{
+	//Get display size.
+	MMSize displaySize = getMainDisplaySize();
+
+	//Create our return object.
+	Local<Object> obj = Nan::New<Object>();
+	Nan::Set(obj, Nan::New("width").ToLocalChecked(), Nan::New<Number>(displaySize.width));
+	Nan::Set(obj, Nan::New("height").ToLocalChecked(), Nan::New<Number>(displaySize.height));
+
+	//Return our object with .width and .height.
+	info.GetReturnValue().Set(obj);
+
+	// todo: here -> change it for getScreenSize content
+  // Isolate* isolate = info.GetIsolate();
+  //   info.GetReturnValue().Set(String::NewFromUtf8(
+  //       isolate, "Hello from cpp code! Hello there! Native context-aware module.").ToLocalChecked());
+}
+
+// Initialize this addon to be context-aware.
+NODE_MODULE_INIT(/* exports, module, context */) {
+  Isolate* isolate = context->GetIsolate();
+
+  AddonData* data = new AddonData(isolate);
+
+  Local<External> external = External::New(isolate, data);
+
+  exports->Set(context,
+               String::NewFromUtf8(isolate, "getScreenSize").ToLocalChecked(),
+               FunctionTemplate::New(isolate, getScreenSize, external)
+                  ->GetFunction(context).ToLocalChecked()).FromJust();
+}
