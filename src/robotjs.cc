@@ -53,7 +53,7 @@ int CheckMouseButton(const char * const b, MMMouseButton * const button)
 	return 0;
 }
 
-NAN_METHOD(dragMouse)
+static void dragMouse(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
 	if (info.Length() < 2 || info.Length() > 3)
 	{
@@ -88,13 +88,14 @@ NAN_METHOD(dragMouse)
 	info.GetReturnValue().Set(Nan::New(1));
 }
 
-NAN_METHOD(updateScreenMetrics)
+static void updateScreenMetrics(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
 	updateScreenMetrics();
 
 	info.GetReturnValue().Set(Nan::New(1));
 }
-static void moveMouse(const v8::FunctionCallbackInfo<v8::Value>& info) 
+
+static void moveMouse(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
 	if (info.Length() != 2)
 	{
@@ -112,7 +113,7 @@ static void moveMouse(const v8::FunctionCallbackInfo<v8::Value>& info)
 	info.GetReturnValue().Set(Nan::New(1));
 }
 
-NAN_METHOD(moveMouseSmooth)
+static void moveMouseSmooth(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
 	if (info.Length() > 3 || info.Length() < 2 )
 	{
@@ -137,7 +138,7 @@ NAN_METHOD(moveMouseSmooth)
 	info.GetReturnValue().Set(Nan::New(1));
 }
 
-static void getMousePos(const v8::FunctionCallbackInfo<v8::Value>& info) 
+static void getMousePos(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
 	MMPoint pos = getMousePos();
 
@@ -148,7 +149,7 @@ static void getMousePos(const v8::FunctionCallbackInfo<v8::Value>& info)
 	info.GetReturnValue().Set(obj);
 }
 
-NAN_METHOD(mouseClick)
+static void mouseClick(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
 	MMMouseButton button = LEFT_BUTTON;
 	bool doubleC = false;
@@ -192,7 +193,7 @@ NAN_METHOD(mouseClick)
 	info.GetReturnValue().Set(Nan::New(1));
 }
 
-NAN_METHOD(mouseToggle)
+static void mouseToggle(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
 	MMMouseButton button = LEFT_BUTTON;
 	bool down = false;
@@ -244,19 +245,7 @@ NAN_METHOD(mouseToggle)
 	info.GetReturnValue().Set(Nan::New(1));
 }
 
-NAN_METHOD(setMouseDelay)
-{
-	if (info.Length() != 1)
-	{
-		return Nan::ThrowError("Invalid number of arguments.");
-	}
-
-	mouseDelay = Nan::To<int32_t>(info[0]).FromJust();
-
-	info.GetReturnValue().Set(Nan::New(1));
-}
-
-NAN_METHOD(scrollMouse)
+static void scrollMouse(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
 	if (info.Length() != 2)
 	{
@@ -271,6 +260,19 @@ NAN_METHOD(scrollMouse)
 
 	info.GetReturnValue().Set(Nan::New(1));
 }
+
+static void setMouseDelay(const v8::FunctionCallbackInfo<v8::Value>& info)
+{
+	if (info.Length() != 1)
+	{
+		return Nan::ThrowError("Invalid number of arguments.");
+	}
+
+	mouseDelay = Nan::To<int32_t>(info[0]).FromJust();
+
+	info.GetReturnValue().Set(Nan::New(1));
+}
+
 /*
  _  __          _                         _
 | |/ /___ _   _| |__   ___   __ _ _ __ __| |
@@ -475,7 +477,7 @@ int GetFlagsFromValue(v8::Local<v8::Value> value, MMKeyFlags* flags)
 	return GetFlagsFromString(value, flags);
 }
 
-NAN_METHOD(keyTap)
+static void keyTap(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
 	MMKeyFlags flags = MOD_NONE;
 	MMKeyCode key;
@@ -520,8 +522,7 @@ NAN_METHOD(keyTap)
 	info.GetReturnValue().Set(Nan::New(1));
 }
 
-
-NAN_METHOD(keyToggle)
+static void keyToggle(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
 	MMKeyFlags flags = MOD_NONE;
 	MMKeyCode key;
@@ -595,7 +596,7 @@ NAN_METHOD(keyToggle)
 	info.GetReturnValue().Set(Nan::New(1));
 }
 
-NAN_METHOD(typeString)
+static void typeString(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
 	char *str;
 	Nan::Utf8String string(info[0]);
@@ -607,7 +608,7 @@ NAN_METHOD(typeString)
 	info.GetReturnValue().Set(Nan::New(1));
 }
 
-NAN_METHOD(typeStringDelayed)
+static void typeStringDelayed(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
 	char *str;
 	Nan::Utf8String string(info[0]);
@@ -621,7 +622,7 @@ NAN_METHOD(typeStringDelayed)
 	info.GetReturnValue().Set(Nan::New(1));
 }
 
-NAN_METHOD(setKeyboardDelay)
+static void setKeyboardDelay(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
 	if (info.Length() != 1)
 	{
@@ -654,7 +655,7 @@ void padHex(MMRGBHex color, char* hex)
 	snprintf(hex, 7, "%06x", color);
 }
 
-NAN_METHOD(getPixelColor)
+static void getPixelColor(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
 	if (info.Length() != 2)
 	{
@@ -685,7 +686,7 @@ NAN_METHOD(getPixelColor)
 	info.GetReturnValue().Set(Nan::New(hex).ToLocalChecked());
 }
 
-static void getScreenSize(const v8::FunctionCallbackInfo<v8::Value>& info) 
+static void getScreenSize(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
 	//Get display size.
 	MMSize displaySize = getMainDisplaySize();
@@ -699,7 +700,7 @@ static void getScreenSize(const v8::FunctionCallbackInfo<v8::Value>& info)
 	info.GetReturnValue().Set(obj);
 }
 
-NAN_METHOD(getXDisplayName)
+static void getXDisplayName(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
 	#if defined(USE_X11)
 	const char* display = getXDisplay();
@@ -709,7 +710,7 @@ NAN_METHOD(getXDisplayName)
 	#endif
 }
 
-NAN_METHOD(setXDisplayName)
+static void setXDisplayName(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
 	#if defined(USE_X11)
 	Nan::Utf8String string(info[0]);
@@ -720,7 +721,7 @@ NAN_METHOD(setXDisplayName)
 	#endif
 }
 
-NAN_METHOD(captureScreen)
+static void captureScreen(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
 	size_t x;
 	size_t y;
@@ -808,7 +809,7 @@ BMP buildBMP(Local<Object> info)
 	return img;
  }
 
-NAN_METHOD(getColor)
+static void getColor(const v8::FunctionCallbackInfo<v8::Value>& info)
 {
 	MMBitmapRef bitmap;
 	MMRGBHex color;
@@ -840,12 +841,6 @@ NAN_METHOD(getColor)
 
 }
 
-NAN_MODULE_INIT(InitAll)
-{
-	
-}
-
-
 using namespace v8;
 
 class AddonData {
@@ -875,69 +870,103 @@ NODE_MODULE_INIT(/* exports, module, context */)
 
   Local<External> external = External::New(isolate, data);
 
-	// Nan::Set(target, Nan::New("dragMouse").ToLocalChecked(),
-	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(dragMouse)).ToLocalChecked());
+	exports->Set(context,
+               String::NewFromUtf8(isolate, "dragMouse").ToLocalChecked(),
+               FunctionTemplate::New(isolate, dragMouse, external)
+                  ->GetFunction(context).ToLocalChecked()).FromJust();
 
-	// Nan::Set(target, Nan::New("updateScreenMetrics").ToLocalChecked(),
-	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(updateScreenMetrics)).ToLocalChecked());
+	exports->Set(context,
+               String::NewFromUtf8(isolate, "updateScreenMetrics").ToLocalChecked(),
+               FunctionTemplate::New(isolate, updateScreenMetrics, external)
+                  ->GetFunction(context).ToLocalChecked()).FromJust();
 
 	exports->Set(context,
                String::NewFromUtf8(isolate, "moveMouse").ToLocalChecked(),
                FunctionTemplate::New(isolate, moveMouse, external)
                   ->GetFunction(context).ToLocalChecked()).FromJust();
 
-	// Nan::Set(target, Nan::New("moveMouseSmooth").ToLocalChecked(),
-	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(moveMouseSmooth)).ToLocalChecked());
+	exports->Set(context,
+               String::NewFromUtf8(isolate, "moveMouseSmooth").ToLocalChecked(),
+               FunctionTemplate::New(isolate, moveMouseSmooth, external)
+                  ->GetFunction(context).ToLocalChecked()).FromJust();
 
 	exports->Set(context,
                String::NewFromUtf8(isolate, "getMousePos").ToLocalChecked(),
                FunctionTemplate::New(isolate, getMousePos, external)
                   ->GetFunction(context).ToLocalChecked()).FromJust();	
 
-	// Nan::Set(target, Nan::New("mouseClick").ToLocalChecked(),
-	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(mouseClick)).ToLocalChecked());
+	exports->Set(context,
+               String::NewFromUtf8(isolate, "mouseClick").ToLocalChecked(),
+               FunctionTemplate::New(isolate, mouseClick, external)
+                  ->GetFunction(context).ToLocalChecked()).FromJust();
 
-	// Nan::Set(target, Nan::New("mouseToggle").ToLocalChecked(),
-	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(mouseToggle)).ToLocalChecked());
+	exports->Set(context,
+               String::NewFromUtf8(isolate, "mouseToggle").ToLocalChecked(),
+               FunctionTemplate::New(isolate, mouseToggle, external)
+                  ->GetFunction(context).ToLocalChecked()).FromJust();
 
-	// Nan::Set(target, Nan::New("scrollMouse").ToLocalChecked(),
-	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(scrollMouse)).ToLocalChecked());
+	exports->Set(context,
+               String::NewFromUtf8(isolate, "scrollMouse").ToLocalChecked(),
+               FunctionTemplate::New(isolate, scrollMouse, external)
+                  ->GetFunction(context).ToLocalChecked()).FromJust();
 
-	// Nan::Set(target, Nan::New("setMouseDelay").ToLocalChecked(),
-	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(setMouseDelay)).ToLocalChecked());
+	exports->Set(context,
+               String::NewFromUtf8(isolate, "setMouseDelay").ToLocalChecked(),
+               FunctionTemplate::New(isolate, setMouseDelay, external)
+                  ->GetFunction(context).ToLocalChecked()).FromJust();
 
-	// Nan::Set(target, Nan::New("keyTap").ToLocalChecked(),
-	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(keyTap)).ToLocalChecked());
+	exports->Set(context,
+               String::NewFromUtf8(isolate, "keyTap").ToLocalChecked(),
+               FunctionTemplate::New(isolate, keyTap, external)
+                  ->GetFunction(context).ToLocalChecked()).FromJust();
 
-	// Nan::Set(target, Nan::New("keyToggle").ToLocalChecked(),
-	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(keyToggle)).ToLocalChecked());
+	exports->Set(context,
+               String::NewFromUtf8(isolate, "keyToggle").ToLocalChecked(),
+               FunctionTemplate::New(isolate, keyToggle, external)
+                  ->GetFunction(context).ToLocalChecked()).FromJust();
 
-	// Nan::Set(target, Nan::New("typeString").ToLocalChecked(),
-	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(typeString)).ToLocalChecked());
+	exports->Set(context,
+               String::NewFromUtf8(isolate, "typeString").ToLocalChecked(),
+               FunctionTemplate::New(isolate, typeString, external)
+                  ->GetFunction(context).ToLocalChecked()).FromJust();
 
-	// Nan::Set(target, Nan::New("typeStringDelayed").ToLocalChecked(),
-	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(typeStringDelayed)).ToLocalChecked());
+	exports->Set(context,
+               String::NewFromUtf8(isolate, "typeStringDelayed").ToLocalChecked(),
+               FunctionTemplate::New(isolate, typeStringDelayed, external)
+                  ->GetFunction(context).ToLocalChecked()).FromJust();
 
-	// Nan::Set(target, Nan::New("setKeyboardDelay").ToLocalChecked(),
-	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(setKeyboardDelay)).ToLocalChecked());
+	exports->Set(context,
+               String::NewFromUtf8(isolate, "setKeyboardDelay").ToLocalChecked(),
+               FunctionTemplate::New(isolate, setKeyboardDelay, external)
+                  ->GetFunction(context).ToLocalChecked()).FromJust();
 
-	// Nan::Set(target, Nan::New("getPixelColor").ToLocalChecked(),
-	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(getPixelColor)).ToLocalChecked());
+	exports->Set(context,
+               String::NewFromUtf8(isolate, "getPixelColor").ToLocalChecked(),
+               FunctionTemplate::New(isolate, getPixelColor, external)
+                  ->GetFunction(context).ToLocalChecked()).FromJust();
 
 	exports->Set(context,
                String::NewFromUtf8(isolate, "getScreenSize").ToLocalChecked(),
                FunctionTemplate::New(isolate, getScreenSize, external)
                   ->GetFunction(context).ToLocalChecked()).FromJust();
 
-	// Nan::Set(target, Nan::New("captureScreen").ToLocalChecked(),
-	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(captureScreen)).ToLocalChecked());
+	exports->Set(context,
+               String::NewFromUtf8(isolate, "captureScreen").ToLocalChecked(),
+               FunctionTemplate::New(isolate, captureScreen, external)
+                  ->GetFunction(context).ToLocalChecked()).FromJust();
 
-	// Nan::Set(target, Nan::New("getColor").ToLocalChecked(),
-	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(getColor)).ToLocalChecked());
+	exports->Set(context,
+               String::NewFromUtf8(isolate, "getColor").ToLocalChecked(),
+               FunctionTemplate::New(isolate, getColor, external)
+                  ->GetFunction(context).ToLocalChecked()).FromJust();
 
-	// Nan::Set(target, Nan::New("getXDisplayName").ToLocalChecked(),
-	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(getXDisplayName)).ToLocalChecked());
+	exports->Set(context,
+               String::NewFromUtf8(isolate, "getXDisplayName").ToLocalChecked(),
+               FunctionTemplate::New(isolate, getXDisplayName, external)
+                  ->GetFunction(context).ToLocalChecked()).FromJust();
 
-	// Nan::Set(target, Nan::New("setXDisplayName").ToLocalChecked(),
-	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(setXDisplayName)).ToLocalChecked());									
+	exports->Set(context,
+               String::NewFromUtf8(isolate, "setXDisplayName").ToLocalChecked(),
+               FunctionTemplate::New(isolate, setXDisplayName, external)
+                  ->GetFunction(context).ToLocalChecked()).FromJust();								
 }
