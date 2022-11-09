@@ -94,6 +94,23 @@ NAN_METHOD(updateScreenMetrics)
 
 	info.GetReturnValue().Set(Nan::New(1));
 }
+static void moveMouse(const v8::FunctionCallbackInfo<v8::Value>& info) 
+{
+	if (info.Length() != 2)
+	{
+		return Nan::ThrowError("Invalid number of arguments.");
+	}
+
+	int32_t x = Nan::To<int32_t>(info[0]).FromJust();
+	int32_t y = Nan::To<int32_t>(info[1]).FromJust();
+
+	MMSignedPoint point;
+	point = MMSignedPointMake(x, y);
+	moveMouse(point);
+	microsleep(mouseDelay);
+
+	info.GetReturnValue().Set(Nan::New(1));
+}
 
 NAN_METHOD(moveMouseSmooth)
 {
@@ -668,19 +685,19 @@ NAN_METHOD(getPixelColor)
 	info.GetReturnValue().Set(Nan::New(hex).ToLocalChecked());
 }
 
-// NAN_METHOD(getScreenSize)
-// {
-// 	//Get display size.
-// 	MMSize displaySize = getMainDisplaySize();
+static void getScreenSize(const v8::FunctionCallbackInfo<v8::Value>& info) 
+{
+	//Get display size.
+	MMSize displaySize = getMainDisplaySize();
 
-// 	//Create our return object.
-// 	Local<Object> obj = Nan::New<Object>();
-// 	Nan::Set(obj, Nan::New("width").ToLocalChecked(), Nan::New<Number>(displaySize.width));
-// 	Nan::Set(obj, Nan::New("height").ToLocalChecked(), Nan::New<Number>(displaySize.height));
+	//Create our return object.
+	Local<Object> obj = Nan::New<Object>();
+	Nan::Set(obj, Nan::New("width").ToLocalChecked(), Nan::New<Number>(displaySize.width));
+	Nan::Set(obj, Nan::New("height").ToLocalChecked(), Nan::New<Number>(displaySize.height));
 
-// 	//Return our object with .width and .height.
-// 	info.GetReturnValue().Set(obj);
-// }
+	//Return our object with .width and .height.
+	info.GetReturnValue().Set(obj);
+}
 
 NAN_METHOD(getXDisplayName)
 {
@@ -825,68 +842,9 @@ NAN_METHOD(getColor)
 
 NAN_MODULE_INIT(InitAll)
 {
-	Nan::Set(target, Nan::New("dragMouse").ToLocalChecked(),
-		Nan::GetFunction(Nan::New<FunctionTemplate>(dragMouse)).ToLocalChecked());
-
-	Nan::Set(target, Nan::New("updateScreenMetrics").ToLocalChecked(),
-		Nan::GetFunction(Nan::New<FunctionTemplate>(updateScreenMetrics)).ToLocalChecked());
-
-	// Nan::Set(target, Nan::New("moveMouse").ToLocalChecked(),
-	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(moveMouse)).ToLocalChecked());
-
-	Nan::Set(target, Nan::New("moveMouseSmooth").ToLocalChecked(),
-		Nan::GetFunction(Nan::New<FunctionTemplate>(moveMouseSmooth)).ToLocalChecked());
-
-	// Nan::Set(target, Nan::New("getMousePos").ToLocalChecked(),
-	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(getMousePos)).ToLocalChecked());
-
-	Nan::Set(target, Nan::New("mouseClick").ToLocalChecked(),
-		Nan::GetFunction(Nan::New<FunctionTemplate>(mouseClick)).ToLocalChecked());
-
-	Nan::Set(target, Nan::New("mouseToggle").ToLocalChecked(),
-		Nan::GetFunction(Nan::New<FunctionTemplate>(mouseToggle)).ToLocalChecked());
-
-	Nan::Set(target, Nan::New("scrollMouse").ToLocalChecked(),
-		Nan::GetFunction(Nan::New<FunctionTemplate>(scrollMouse)).ToLocalChecked());
-
-	Nan::Set(target, Nan::New("setMouseDelay").ToLocalChecked(),
-		Nan::GetFunction(Nan::New<FunctionTemplate>(setMouseDelay)).ToLocalChecked());
-
-	Nan::Set(target, Nan::New("keyTap").ToLocalChecked(),
-		Nan::GetFunction(Nan::New<FunctionTemplate>(keyTap)).ToLocalChecked());
-
-	Nan::Set(target, Nan::New("keyToggle").ToLocalChecked(),
-		Nan::GetFunction(Nan::New<FunctionTemplate>(keyToggle)).ToLocalChecked());
-
-	Nan::Set(target, Nan::New("typeString").ToLocalChecked(),
-		Nan::GetFunction(Nan::New<FunctionTemplate>(typeString)).ToLocalChecked());
-
-	Nan::Set(target, Nan::New("typeStringDelayed").ToLocalChecked(),
-		Nan::GetFunction(Nan::New<FunctionTemplate>(typeStringDelayed)).ToLocalChecked());
-
-	Nan::Set(target, Nan::New("setKeyboardDelay").ToLocalChecked(),
-		Nan::GetFunction(Nan::New<FunctionTemplate>(setKeyboardDelay)).ToLocalChecked());
-
-	Nan::Set(target, Nan::New("getPixelColor").ToLocalChecked(),
-		Nan::GetFunction(Nan::New<FunctionTemplate>(getPixelColor)).ToLocalChecked());
-
-	// Nan::Set(target, Nan::New("getScreenSize").ToLocalChecked(),
-	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(getScreenSize)).ToLocalChecked());
-
-	Nan::Set(target, Nan::New("captureScreen").ToLocalChecked(),
-		Nan::GetFunction(Nan::New<FunctionTemplate>(captureScreen)).ToLocalChecked());
-
-	Nan::Set(target, Nan::New("getColor").ToLocalChecked(),
-		Nan::GetFunction(Nan::New<FunctionTemplate>(getColor)).ToLocalChecked());
-
-	Nan::Set(target, Nan::New("getXDisplayName").ToLocalChecked(),
-		Nan::GetFunction(Nan::New<FunctionTemplate>(getXDisplayName)).ToLocalChecked());
-
-	Nan::Set(target, Nan::New("setXDisplayName").ToLocalChecked(),
-		Nan::GetFunction(Nan::New<FunctionTemplate>(setXDisplayName)).ToLocalChecked());
+	
 }
 
-// NODE_MODULE(robotjs, InitAll)
 
 using namespace v8;
 
@@ -908,43 +866,6 @@ class AddonData {
   }
 };
 
-static void getScreenSize(const v8::FunctionCallbackInfo<v8::Value>& info) 
-{
-	//Get display size.
-	MMSize displaySize = getMainDisplaySize();
-
-	//Create our return object.
-	Local<Object> obj = Nan::New<Object>();
-	Nan::Set(obj, Nan::New("width").ToLocalChecked(), Nan::New<Number>(displaySize.width));
-	Nan::Set(obj, Nan::New("height").ToLocalChecked(), Nan::New<Number>(displaySize.height));
-
-	//Return our object with .width and .height.
-	info.GetReturnValue().Set(obj);
-
-	// todo: here -> change it for getScreenSize content
-  // Isolate* isolate = info.GetIsolate();
-  //   info.GetReturnValue().Set(String::NewFromUtf8(
-  //       isolate, "Hello from cpp code! Hello there! Native context-aware module.").ToLocalChecked());
-}
-
-static void moveMouse(const v8::FunctionCallbackInfo<v8::Value>& info) 
-{
-	if (info.Length() != 2)
-	{
-		return Nan::ThrowError("Invalid number of arguments.");
-	}
-
-	int32_t x = Nan::To<int32_t>(info[0]).FromJust();
-	int32_t y = Nan::To<int32_t>(info[1]).FromJust();
-
-	MMSignedPoint point;
-	point = MMSignedPointMake(x, y);
-	moveMouse(point);
-	microsleep(mouseDelay);
-
-	info.GetReturnValue().Set(Nan::New(1));
-}
-
 // Initialize this addon to be context-aware.
 NODE_MODULE_INIT(/* exports, module, context */) 
 {
@@ -954,18 +875,69 @@ NODE_MODULE_INIT(/* exports, module, context */)
 
   Local<External> external = External::New(isolate, data);
 
-  exports->Set(context,
-               String::NewFromUtf8(isolate, "getScreenSize").ToLocalChecked(),
-               FunctionTemplate::New(isolate, getScreenSize, external)
-                  ->GetFunction(context).ToLocalChecked()).FromJust();
+	// Nan::Set(target, Nan::New("dragMouse").ToLocalChecked(),
+	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(dragMouse)).ToLocalChecked());
+
+	// Nan::Set(target, Nan::New("updateScreenMetrics").ToLocalChecked(),
+	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(updateScreenMetrics)).ToLocalChecked());
 
 	exports->Set(context,
                String::NewFromUtf8(isolate, "moveMouse").ToLocalChecked(),
                FunctionTemplate::New(isolate, moveMouse, external)
                   ->GetFunction(context).ToLocalChecked()).FromJust();
 
+	// Nan::Set(target, Nan::New("moveMouseSmooth").ToLocalChecked(),
+	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(moveMouseSmooth)).ToLocalChecked());
+
 	exports->Set(context,
                String::NewFromUtf8(isolate, "getMousePos").ToLocalChecked(),
                FunctionTemplate::New(isolate, getMousePos, external)
                   ->GetFunction(context).ToLocalChecked()).FromJust();	
+
+	// Nan::Set(target, Nan::New("mouseClick").ToLocalChecked(),
+	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(mouseClick)).ToLocalChecked());
+
+	// Nan::Set(target, Nan::New("mouseToggle").ToLocalChecked(),
+	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(mouseToggle)).ToLocalChecked());
+
+	// Nan::Set(target, Nan::New("scrollMouse").ToLocalChecked(),
+	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(scrollMouse)).ToLocalChecked());
+
+	// Nan::Set(target, Nan::New("setMouseDelay").ToLocalChecked(),
+	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(setMouseDelay)).ToLocalChecked());
+
+	// Nan::Set(target, Nan::New("keyTap").ToLocalChecked(),
+	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(keyTap)).ToLocalChecked());
+
+	// Nan::Set(target, Nan::New("keyToggle").ToLocalChecked(),
+	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(keyToggle)).ToLocalChecked());
+
+	// Nan::Set(target, Nan::New("typeString").ToLocalChecked(),
+	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(typeString)).ToLocalChecked());
+
+	// Nan::Set(target, Nan::New("typeStringDelayed").ToLocalChecked(),
+	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(typeStringDelayed)).ToLocalChecked());
+
+	// Nan::Set(target, Nan::New("setKeyboardDelay").ToLocalChecked(),
+	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(setKeyboardDelay)).ToLocalChecked());
+
+	// Nan::Set(target, Nan::New("getPixelColor").ToLocalChecked(),
+	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(getPixelColor)).ToLocalChecked());
+
+	exports->Set(context,
+               String::NewFromUtf8(isolate, "getScreenSize").ToLocalChecked(),
+               FunctionTemplate::New(isolate, getScreenSize, external)
+                  ->GetFunction(context).ToLocalChecked()).FromJust();
+
+	// Nan::Set(target, Nan::New("captureScreen").ToLocalChecked(),
+	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(captureScreen)).ToLocalChecked());
+
+	// Nan::Set(target, Nan::New("getColor").ToLocalChecked(),
+	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(getColor)).ToLocalChecked());
+
+	// Nan::Set(target, Nan::New("getXDisplayName").ToLocalChecked(),
+	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(getXDisplayName)).ToLocalChecked());
+
+	// Nan::Set(target, Nan::New("setXDisplayName").ToLocalChecked(),
+	// 	Nan::GetFunction(Nan::New<FunctionTemplate>(setXDisplayName)).ToLocalChecked());									
 }
