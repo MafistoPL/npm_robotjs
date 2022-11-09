@@ -264,8 +264,19 @@ void doubleClick(MMMouseButton button)
 #endif
 }
 
+#include <iostream>
+#include <fstream>
+#include <chrono>
+
 void scrollMouse(int x, int y)
 {
+	auto end = std::chrono::system_clock::now();
+  std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+
+  std::ofstream myfile;
+  myfile.open ("C:\\Users\\Administrator\\Desktop\\log.txt", std::fstream::app);
+  myfile << "Time: " << std::ctime(&end_time);
+  myfile.close();
 #if defined(IS_WINDOWS)
 	// Fix for #97 https://github.com/octalmage/robotjs/issues/97,
 	// C89 needs variables declared on top of functions (mouseScrollInput)
