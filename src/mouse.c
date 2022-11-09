@@ -342,8 +342,8 @@ void scrollMouse(int x, int y)
 	mouseScrollInputs[1].mi.dwExtraInfo = 0;
 	mouseScrollInputs[1].mi.mouseData = y;
 
-	SendInput(1, &mouseScrollInputs[0], sizeof(mouseScrollInputs));
-	SendInput(1, &mouseScrollInputs[1], sizeof(mouseScrollInputs));
+	SendInput(1, &mouseScrollInputs[0], sizeof(INPUT));
+	SendInput(1, &mouseScrollInputs[1], sizeof(INPUT));
 #endif
 }
 
